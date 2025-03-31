@@ -139,22 +139,25 @@
             }
         }
 
-        async function deleteCourse(id) {
-            console.log("deleting course id:", id);
-            try {
-                const response = await fetch(`https://ipu-site-backend.onrender.com/api/courses/${id}`, {
-                    method: 'DELETE',
-                });
-                if (!response.ok) {
-                    console.error('Failed to delete course:', response.status, response.statusText, response);
-                    alert('Failed to delete course.');
-                }
-            } catch (error) {
-                console.error('Error deleting course:', error);
-                alert('Error deleting course.');
-            }
+       async function deleteCourse(id) {
+    console.log("deleting course id:", id);
+    try {
+        const response = await fetch(`https://ipu-site-backend.onrender.com/api/courses/${id}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            const errorMessage = `Failed to delete course: Status ${response.status}, ${response.statusText}`;
+            console.error(errorMessage, response);
+            alert(errorMessage); // Display error details
+        } else {
+          alert('Course deleted sucessfully')
         }
-
+    } catch (error) {
+        const errorMessage = `Error deleting course: ${error.message}`;
+        console.error(errorMessage, error);
+        alert(errorMessage); // Display error details
+    }
+}
         searchInput.addEventListener('input', () => {
             fetchCourses(searchInput.value);
         });
