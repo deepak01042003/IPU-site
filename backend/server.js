@@ -24,6 +24,9 @@ const db = new Pool({
     database: "deeps",
     password: "eZLyZqhlzbKNHDdwh3VZCDoTmiCu3X1r",
     port: 5432,
+   ssl: {
+    rejectUnauthorized: false, // Important for Render
+  },
 });
 
 const createUsersTable = async () => {
