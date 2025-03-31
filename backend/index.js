@@ -28,6 +28,7 @@ const db = new Pool({
     require: true,
     rejectUnauthorized: false, // Use with caution
   },
+   connectionTimeoutMillis: 5000,
 });
 
 const createUsersTable = async () => {
