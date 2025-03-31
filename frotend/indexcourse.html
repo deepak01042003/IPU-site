@@ -100,7 +100,7 @@
 
         async function fetchCourses(searchTerm = '') {
             try {
-                const response = await fetch('http://localhost:3000/api/courses');
+                const response = await fetch('https://ipu-site-backend.onrender.com/api/courses');
                 const courses = await response.json();
                 const reversedCourses = courses.reverse();
 
@@ -141,7 +141,7 @@
 
         async function deleteCourse(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/courses/delete/${id}`, {
+                const response = await fetch(`https://ipu-site-backend.onrender.com/courses/delete/${id}`, {
                     method: 'DELETE',
                 });
                 if (!response.ok) {
