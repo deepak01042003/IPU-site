@@ -67,16 +67,22 @@ app.post("/api/courses/add", async (req, res) => {
 
 app.delete("/api/courses/delete/:id", async (req, res) => {
     const { id } = req.params;
+    console.log("Received delete request for course ID:", id); // added log
+    console.log("SQL Query: DELETE FROM course WHERE course_id = $1", [id]); // added log
     try {
-        await db.query("DELETE FROM course WHERE course_id = $1", [id]);
+        const result = await db.query("DELETE FROM course WHERE course_id = $1", [id]);
+        console.log("Database result:", result); //added log
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Course not found" });
+        }
         res.json({ message: "Course deleted" });
     } catch (error) {
-        console.error('Error deleting course:', error);
-    console.error('Request details:');
-    console.error('  Method:', req.method);
-    console.error('  URL:', req.originalUrl);
-    console.error('  Params:', req.params);
-        res.status(500).json({ error: "Error deleting course" });
+        console.error("Error deleting course:", error);
+        console.error("Request details:");
+        console.error("  Method:", req.method);
+        console.error("  URL:", req.originalUrl);
+        console.error("  Params:", req.params);
+        res.status(500).json({ error: "Error deleting course", details: error.message }); // added error.message
     }
 });
 
