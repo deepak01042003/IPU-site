@@ -19,11 +19,11 @@ const { Pool } = pkg;
 
 // Use environment variables for database connection
 const db = new Pool({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT,
+   user: "deepak",
+    host: "dpg-cvlbn73e5dus73abh6ug-a.oregon-postgres.render.com",
+    database: "deeps",
+    password: "eZLyZqhlzbKNHDdwh3VZCDoTmiCu3X1r",
+    port: 5432,
 });
 
 const createUsersTable = async () => {
