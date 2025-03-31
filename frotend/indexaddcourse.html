@@ -107,7 +107,7 @@
             const description = courseDetailInput.innerHTML; // Get HTML content
 
             try {
-                const response = await fetch('http://localhost:3000/api/courses/add', {
+                const response = await fetch('https://ipu-site-backend.onrender.com/api/courses/add', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, description }),
