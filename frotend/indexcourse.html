@@ -48,10 +48,10 @@
             color: #007bff;
         }
 
-        .course .course-detail { /* Change to class for easier styling */
+        .course .course-detail {
             margin-bottom: 10px;
             color: #555;
-            white-space: pre-wrap; /* Preserve formatting */
+            white-space: pre-wrap;
         }
 
         .deleteButton {
@@ -140,12 +140,13 @@
         }
 
         async function deleteCourse(id) {
+            console.log("deleting course id:", id);
             try {
-                const response = await fetch(`https://ipu-site-backend.onrender.com/courses/delete/${id}`, {
+                const response = await fetch(`https://ipu-site-backend.onrender.com/api/courses/${id}`, {
                     method: 'DELETE',
                 });
                 if (!response.ok) {
-                    console.error('Failed to delete course:', response.statusText);
+                    console.error('Failed to delete course:', response.status, response.statusText, response);
                     alert('Failed to delete course.');
                 }
             } catch (error) {
