@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Courses</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .course {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .course h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .course .course-detail { /* Change to class for easier styling */
+            margin-bottom: 10px;
+            color: #555;
+            white-space: pre-wrap; /* Preserve formatting */
+        }
+
+        .deleteButton {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .deleteButton:hover {
+            background-color: #c82333;
+        }
+
+        .back-button {
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+            align-self: flex-start;
+        }
+
+        .back-button:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="location.href='index.html'">Back To Home</button>
+    <div class="container">
+        <input type="text" id="searchInput" placeholder="Search by Course Name">
+        <h1>Course List</h1>
+        <div id="courseList"></div>
+    </div>
+
+    <script>
+        const courseListDiv = document.getElementById('courseList');
+        const searchInput = document.getElementById('searchInput');
+
+        async function fetchCourses(searchTerm = '') {
+            try {
+                const response = await fetch('http://localhost:3000/api/courses');
+                const courses = await response.json();
+                const reversedCourses = courses.reverse();
+
+                courseListDiv.innerHTML = '';
+                reversedCourses.forEach(course => {
+                    const courseName = course.course_name.toLowerCase();
+                    const search = searchTerm.toLowerCase();
+                    let include = true;
+                    if (searchTerm && !courseName.includes(search)) {
+                        include = false;
+                    }
+                    if (include) {
+                        const courseDiv = document.createElement('div');
+                        courseDiv.className = 'course';
+                        courseDiv.innerHTML = `
+                            <h3>${course.course_name}</h3>
+                            <p class="course-detail">${course.course_detail}</p>
+                            <button class="deleteButton" data-id="${course.course_id}">Delete</button>
+                        `;
+                        courseListDiv.appendChild(courseDiv);
+                    }
+                });
+
+                const deleteButtons = document.querySelectorAll('.deleteButton');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', async (event) => {
+                        const courseId = event.target.dataset.id;
+                        await deleteCourse(courseId);
+                        fetchCourses(searchInput.value);
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error fetching courses:', error);
+                courseListDiv.innerHTML = '<p>Error loading courses.</p>';
+            }
+        }
+
+        async function deleteCourse(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/courses/delete/${id}`, {
+                    method: 'DELETE',
+                });
+                if (!response.ok) {
+                    console.error('Failed to delete course:', response.statusText);
+                    alert('Failed to delete course.');
+                }
+            } catch (error) {
+                console.error('Error deleting course:', error);
+                alert('Error deleting course.');
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            fetchCourses(searchInput.value);
+        });
+
+        fetchCourses();
+    </script>
+</body>
+</html>

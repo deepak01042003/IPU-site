@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Placement List</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .placement {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .placement h3 {
+            margin-top: 0;
+        }
+
+        .placement p {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+        }
+
+        .placement .placement-type,
+        .placement .placement-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #e0f7fa;
+            color: #00838f;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            display: inline-block;
+            margin-left: 5px; /* Added spacing between type and status */
+        }
+
+        .placement .placement-status {
+            top: 40px;
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .placement .placement-deadline {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #ffcdd2;
+            color: #d32f2f;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #placementList {
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        #searchContainer {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #searchContainer input,
+        #searchContainer select,
+        #searchContainer button,
+        #searchContainer input[type="date"] {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        #searchContainer label {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="location.href='index.html'">Back To Home</button>
+    <h1>Placement List</h1>
+
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="Search by Company Name">
+        <label for="typeFilter">Filter by Type:</label>
+        <select id="typeFilter">
+            <option value="">All Types</option>
+            <option value="placement">Placement</option>
+            <option value="internship">Internship</option>
+        </select>
+        <label for="statusFilter">Filter by Status:</label>
+        <select id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="Current">Current</option>
+            <option value="Expired">Expired</option>
+        </select>
+        <label for="startDateFilter">Filter by Start Date:</label>
+        <input type="date" id="startDateFilter">
+        <label for="endDateFilter">Filter by End Date:</label>
+        <input type="date" id="endDateFilter">
+        <button id="clearSearchFilter">Clear Filters</button>
+    </div>
+
+    <h2>Placement List</h2>
+    <div id="placementList"></div>
+
+    <script>
+        const placementListDiv = document.getElementById('placementList');
+        const searchInput = document.getElementById('searchInput');
+        const typeFilter = document.getElementById('typeFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const startDateFilter = document.getElementById('startDateFilter');
+        const endDateFilter = document.getElementById('endDateFilter');
+        const clearSearchFilterButton = document.getElementById('clearSearchFilter');
+
+        async function fetchPlacements(searchTerm = '', filterType = '', filterStatus = '', startDate = '', endDate = '') {
+            try {
+                const response = await fetch('http://localhost:3000/api/placements');
+                const placements = await response.json();
+                const reversedPlacements = placements.reverse();
+                placementListDiv.innerHTML = '';
+
+                reversedPlacements.forEach(placement => {
+                    const companyName = placement.placement_name.toLowerCase();
+                    const search = searchTerm.toLowerCase();
+
+                    let include = true;
+
+                    if (searchTerm && !companyName.includes(search)) {
+                        include = false;
+                    }
+
+                    if (filterType && placement.placement_type !== filterType) {
+                        include = false;
+                    }
+
+                    if (filterStatus && placement.status !== filterStatus) {
+                        include = false;
+                    }
+
+                    if (startDate && placement.placement_deadline && new Date(placement.placement_deadline) < new Date(startDate)) {
+                        include = false;
+                    }
+
+                    if (endDate && placement.placement_deadline && new Date(placement.placement_deadline) > new Date(endDate)) {
+                        include = false;
+                    }
+
+                    if (include) {
+                        const placementDiv = document.createElement('div');
+                        placementDiv.className = 'placement';
+                        placementDiv.innerHTML = `
+                            <h3>${placement.placement_name}</h3>
+                            <p>${placement.placement_detail}</p>
+                            <p>Link: ${placement.placement_link ? `<a href="${placement.placement_link}" target="_blank">${placement.placement_link}</a>` : 'Will upload soon'}</p>
+                            <button class="deletePlacementButton" data-id="${placement.placement_id}">Delete</button>
+                            <span class="placement-type">${placement.placement_type}</span>
+                            <span class="placement-status">${placement.status}</span>
+                            <span class="placement-deadline">${placement.placement_deadline ? placement.placement_deadline : 'Not mentioned'}</span>
+                        `;
+                        placementListDiv.appendChild(placementDiv);
+                        placementDiv.querySelector('p').innerHTML = placement.placement_detail;
+                    }
+                });
+
+                const deleteButtons = document.querySelectorAll('.deletePlacementButton');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', async (event) => {
+                        const placementId = event.target.dataset.id;
+                        await deletePlacement(placementId);
+                        fetchPlacements(searchInput.value, typeFilter.value, statusFilter.value, startDateFilter.value, endDateFilter.value);
+                    });
+                });
+            } catch (error) {
+                console.error('Error fetching placements:', error);
+                placementListDiv.innerHTML = '<p>Error loading placements.</p>';
+            }
+        }
+
+        async function deletePlacement(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/placements/delete/${id}`, {
+                    method: 'DELETE',
+                });
+                if (!response.ok) {
+                    console.error('Failed to delete placement:', response.statusText);
+                    alert('Failed to delete placement.');
+                }
+            } catch (error) {
+                console.error('Error deleting placement:', error);
+                alert('Error deleting placement.');
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            fetchPlacements(searchInput.value, typeFilter.value, statusFilter.value, startDateFilter.value, endDateFilter.value);
+        });
+
+        typeFilter.addEventListener('change', () => {
+            fetchPlacements(searchInput.value, typeFilter.value, statusFilter.value, startDateFilter.value, endDateFilter.value);
+        });
+
+        statusFilter.addEventListener('change', () => {
+            fetchPlacements(searchInput.value, typeFilter.value, statusFilter.value, startDateFilter.value, endDateFilter.value);
+        });
+
+        startDateFilter.addEventListener('change', () => {
+            fetchPlacements(searchInput.value, typeFilter.value, statusFilter.value, startDateFilter.value, endDateFilter.value);
+        });
+
+        endDateFilter.addEventListener('change', () => {
+            fetchPlacements(searchInput.value, typeFilter.value, statusFilter.value, endDateFilter.value, endDateFilter.value);
+        });
+
+        clearSearchFilterButton.addEventListener('click', () => {
+            searchInput.value = '';
+            typeFilter.value = '';
+            statusFilter.value = '';
+            startDateFilter.value = '';
+            endDateFilter.value = '';
+            fetchPlacements();
+        });
+
+        fetchPlacements();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

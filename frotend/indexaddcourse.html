@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Course</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 500px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"], .rich-text {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, .rich-text:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .rich-text {
+            height: 150px;
+            resize: vertical;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+            float: left;
+        }
+
+        .back-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-button" onclick="location.href='index.html'">Back To Home</button>
+        <h1>Add Course</h1>
+        <input type="text" id="courseName" placeholder="Course Name">
+        <div class="rich-text" id="courseDetail" contenteditable="true" placeholder="Course Details"></div>
+        <button id="addCourseButton">Add Course</button>
+    </div>
+
+    <script>
+        const courseNameInput = document.getElementById('courseName');
+        const courseDetailInput = document.getElementById('courseDetail');
+        const addCourseButton = document.getElementById('addCourseButton');
+
+        async function addCourse() {
+            const name = courseNameInput.value;
+            const description = courseDetailInput.innerHTML; // Get HTML content
+
+            try {
+                const response = await fetch('http://localhost:3000/api/courses/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description }),
+                });
+
+                if (response.ok) {
+                    courseNameInput.value = '';
+                    courseDetailInput.innerHTML = ''; // Clear HTML content
+                } else {
+                    console.error('Failed to add course:', response.statusText);
+                    alert('Failed to add course.');
+                }
+            } catch (error) {
+                console.error('Error adding course:', error);
+                alert('Error adding course.');
+            }
+        }
+
+        addCourseButton.addEventListener('click', addCourse);
+    </script>
+</body>
+</html>
