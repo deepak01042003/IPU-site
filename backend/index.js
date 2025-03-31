@@ -71,6 +71,11 @@ app.delete("/api/courses/delete/:id", async (req, res) => {
         await db.query("DELETE FROM course WHERE course_id = $1", [id]);
         res.json({ message: "Course deleted" });
     } catch (error) {
+        console.error('Error deleting course:', error);
+    console.error('Request details:');
+    console.error('  Method:', req.method);
+    console.error('  URL:', req.originalUrl);
+    console.error('  Params:', req.params);
         res.status(500).json({ error: "Error deleting course" });
     }
 });
