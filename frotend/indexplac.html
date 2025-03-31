@@ -152,7 +152,7 @@
 
         async function fetchPlacements(searchTerm = '', filterType = '', filterStatus = '', startDate = '', endDate = '') {
             try {
-                const response = await fetch('http://localhost:3000/api/placements');
+                const response = await fetch('https://ipu-site-backend.onrender.com/api/placements');
                 const placements = await response.json();
                 const reversedPlacements = placements.reverse();
                 placementListDiv.innerHTML = '';
@@ -216,7 +216,7 @@
 
         async function deletePlacement(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/placements/delete/${id}`, {
+                const response = await fetch(`https://ipu-site-backend.onrender.com/placements/delete/${id}`, {
                     method: 'DELETE',
                 });
                 if (!response.ok) {
