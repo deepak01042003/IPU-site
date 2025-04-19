@@ -20,9 +20,9 @@ const { Pool } = pkg;
 // Use environment variables for database connection
 const db = new Pool({
    user: "deepak",
-    host: "dpg-cvlbn73e5dus73abh6ug-a.oregon-postgres.render.com",
-    database: "deeps",
-    password: "eZLyZqhlzbKNHDdwh3VZCDoTmiCu3X1r",
+    host: "dpg-d01sl1fgi27c73f07c40-a.oregon-postgres.render.com",
+    database: "deep_heb1",
+    password: "wJcsdETHPT3sDEnFSYbSKFn9LiPgL3cj",
     port: 5432,
    ssl: {
     require: true,
